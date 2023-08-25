@@ -27,8 +27,16 @@ class InventoryListCreateView(APIView):
         return Response(serializer.data, status=201)
     
     def get(self, request: Request, *args, **kwargs) -> Response:
-        serializer = self.serializer_class(self.get_queryset(), many=True)
-        
+        limit = int(request.query_params.get('limit', 3))
+        offset = int(request.query_params.get('offset', 0))
+
+        if limit > 3:
+            raise Exception('Limit cannot be greater than 3')
+        if offset < 0:
+            raise Exception('Offset cannot be less than 0')
+
+        serializer = self.serializer_class(self.get_queryset()[offset:offset + limit], many=True)
+
         return Response(serializer.data, status=200)
     
     def get_queryset(self):
