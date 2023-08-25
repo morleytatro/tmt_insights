@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -228,6 +228,6 @@ class InventoryListAfterDate(APIView):
     def get(self, request: Request, *args, **kwargs) -> Response:
         date = kwargs['date']
 
-        serializer = self.serializer_class(Inventory.objects.filter(created_at__range=(date, datetime.now())), many=True)
+        serializer = self.serializer_class(Inventory.objects.filter(created_at__range=(date + timedelta(days=1), datetime.now())), many=True)
 
         return Response(serializer.data, status=200)
