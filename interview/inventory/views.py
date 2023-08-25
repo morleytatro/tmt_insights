@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -7,7 +7,6 @@ from rest_framework.views import APIView
 from interview.inventory.models import Inventory, InventoryLanguage, InventoryTag, InventoryType
 from interview.inventory.schemas import InventoryMetaData
 from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, InventoryTypeSerializer
-
 
 class InventoryListCreateView(APIView):
     queryset = Inventory.objects.all()
@@ -222,13 +221,13 @@ class InventoryTypeRetrieveUpdateDestroyView(APIView):
     def get_queryset(self, **kwargs):
         return self.queryset.get(**kwargs)
 
-class InventoryListAfterDay(APIView):
+class InventoryListAfterDate(APIView):
     queryset = Inventory.objects.all()
     serializer_class = InventorySerializer
 
     def get(self, request: Request, *args, **kwargs) -> Response:
-        date = kwargs['day']
-        [year, month, day] = date.split('-')
-        serializer = self.serializer_class(Inventory.objects.filter(created_at__range=[timezone.make_aware(datetime.datetime(int(year), int(month), int(day)))]), many=True)
-        print(serializer.data)
+        date = kwargs['date']
+
+        serializer = self.serializer_class(Inventory.objects.filter(created_at__range=(date, datetime.now())), many=True)
+
         return Response(serializer.data, status=200)
